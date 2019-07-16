@@ -13,7 +13,7 @@ dependencies:
 - Cabal
 - aeson
 - annotated-wl-pprint
-- ansi-terminal
+- ansi-terminal >= 0.9
 - array
 - colour
 - mtl

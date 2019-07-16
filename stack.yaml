@@ -1,1 +1,4 @@
 resolver: nightly-2019-07-15
+
+extra-deps:
+- ansi-terminal-0.9
