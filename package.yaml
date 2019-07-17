@@ -6,7 +6,8 @@ author:      Michael Snoyman
 maintainer:  michael@snoyman.com
 copyright:   2018-2019 FP Complete
 license:     BSD3
-github:      commercialhaskell/stack # TODO move to commercialhaskell/rio-prettyprint!
+github:      commercialhaskell/rio-prettyprint
+description: Combine RIO's log capabilities with pretty printing
 
 dependencies:
 - base >=4.10 && < 5
