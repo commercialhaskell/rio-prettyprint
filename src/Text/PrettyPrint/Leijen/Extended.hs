@@ -210,7 +210,7 @@ displayAnsi
     :: (Pretty a, HasLogFunc env, HasStylesUpdate env,
         MonadReader env m, HasCallStack)
     => Int -> a -> m Utf8Builder
-displayAnsi w = do
+displayAnsi w =
     displayAnsiSimple . renderDefault w . unStyleDoc . pretty
 
 {- Not used --------------------------------------------------------------------
@@ -273,15 +273,15 @@ displayDecoratedWrap f doc = do
 
     go :: SimpleDoc a -> m (Maybe (SimpleDoc a), Utf8Builder)
     go SEmpty = return (Nothing, mempty)
-    go (SChar c x) = liftM (fmap (display c <>)) (go x)
+    go (SChar c x) = fmap (fmap (display c <>)) (go x)
     -- NOTE: Could actually use the length to guess at an initial
     -- allocation.  Better yet would be to just use Text in pprint..
-    go (SText _l s x) = liftM (fmap (fromString s <>)) (go x)
-    go (SLine n x) = liftM (fmap ((display '\n' <>) . (spaces n <>))) (go x)
+    go (SText _l s x) = fmap (fmap (fromString s <>)) (go x)
+    go (SLine n x) = fmap (fmap ((display '\n' <>) . (spaces n <>))) (go x)
     go (SAnnotStart ann x) = do
         (mafter, contents) <- f ann (go x)
         case mafter of
-            Just after -> liftM (fmap (contents <>)) (go after)
+            Just after -> fmap (fmap (contents <>)) (go after)
             Nothing -> error "Invariant violated by input to displayDecoratedWrap: no matching SAnnotStop for SAnnotStart."
     go (SAnnotStop x) = return (Just x, mempty)
 
