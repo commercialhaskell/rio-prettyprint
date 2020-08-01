@@ -18,6 +18,7 @@ module RIO.PrettyPrint
       -- to provide consistency.
     , style
     , displayMilliseconds
+    , logLevelToStyle
       -- * Formatting utils
     , bulletedList
     , spacedBulletedList
@@ -174,3 +175,14 @@ bulletedList = mconcat . intersperse line . map (("*" <+>) . align)
 -- each.
 spacedBulletedList :: [StyleDoc] -> StyleDoc
 spacedBulletedList = mconcat . intersperse (line <> line) . map (("*" <+>) . align)
+
+-- | The 'Style' intended to be associated with a 'LogLevel'.
+--
+-- @since 0.1.1.0
+logLevelToStyle :: LogLevel -> Style
+logLevelToStyle level = case level of
+  LevelDebug   -> Debug
+  LevelInfo    -> Info
+  LevelWarn    -> Warning
+  LevelError   -> Error
+  LevelOther _ -> OtherLevel

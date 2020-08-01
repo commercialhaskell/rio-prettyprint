@@ -17,6 +17,9 @@ defaultStyles :: Styles
 defaultStyles = array (minBound, maxBound)
   [ (Error, ("error", [SetColor Foreground Vivid Red]))
   , (Warning, ("warning", [SetColor Foreground Dull Yellow]))
+  , (Info, ("info", [SetColor Foreground Dull Blue]))
+  , (Debug, ("debug", [SetColor Foreground Dull Green]))
+  , (OtherLevel, ("other-level", [SetColor Foreground Dull Magenta]))
   , (Good, ("good", [SetColor Foreground Vivid Green]))
   , (Shell, ("shell", [SetColor Foreground Vivid Magenta]))
   , (File, ("file", [SetColor Foreground Dull Cyan]))
@@ -30,4 +33,7 @@ defaultStyles = array (minBound, maxBound)
   , (Target, ("target", [SetColor Foreground Vivid Cyan]))
   -- TODO: what color should Module be?
   , (Module, ("module", [SetColor Foreground Vivid Magenta]))
-  , (PkgComponent, ("package-component", [SetColor Foreground Vivid Cyan])) ]
+  , (PkgComponent, ("package-component", [SetColor Foreground Vivid Cyan]))
+  , (Secondary, ("secondary", [SetColor Foreground Vivid Black]))
+  , (Highlight, ("highlight", [SetColor Foreground Vivid Green]))
+  ]
