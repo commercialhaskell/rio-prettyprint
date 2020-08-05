@@ -1,4 +1,2 @@
-resolver: nightly-2019-07-15
-
-extra-deps:
-- ansi-terminal-0.9
+# For GHC 8.8.3 (none for GHC 8.8.4)
+resolver: lts-16.8

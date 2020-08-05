@@ -1,0 +1,4 @@
+# Last for GHC 8.4.x
+resolver: lts-12.14
+extra-deps:
+- ansi-terminal-0.10.3
