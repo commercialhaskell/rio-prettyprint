@@ -1,2 +1,2 @@
-# For GHC 8.8.3 (none for GHC 8.8.4)
-resolver: lts-16.8
+# For GHC 8.8.4
+resolver: lts-16.12
