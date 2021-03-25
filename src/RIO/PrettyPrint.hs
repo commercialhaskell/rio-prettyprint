@@ -38,8 +38,13 @@ module RIO.PrettyPrint
 
 import Data.List (intersperse)
 import RIO
-import RIO.PrettyPrint.StylesUpdate (HasStylesUpdate (..))
+import qualified RIO.Map as M
+import RIO.Process (envVarsL)
+import RIO.PrettyPrint.StylesUpdate (HasStylesUpdate (..),
+                                     parseStylesUpdateFromString)
 import RIO.PrettyPrint.Types (Style (..))
+import qualified RIO.Text as T
+
 import Text.PrettyPrint.Leijen.Extended (Pretty (pretty),
                      StyleAnn (..), StyleDoc, (<+>), align,
                      angles, braces, brackets, cat,
@@ -52,6 +57,21 @@ import Text.PrettyPrint.Leijen.Extended (Pretty (pretty),
 class (HasLogFunc env, HasStylesUpdate env) => HasTerm env where
   useColorL :: Lens' env Bool
   termWidthL :: Lens' env Int
+
+lookupEnvVar :: Text -> SimpleApp -> Maybe Text
+lookupEnvVar name env = M.lookup name $ (getConst . envVarsL Const) env
+
+instance HasStylesUpdate SimpleApp where
+  stylesUpdateL = lens (\_ -> parseStylesUpdateFromString "") const
+
+instance HasTerm SimpleApp where
+  useColorL =
+    lens ((== Just "truecolor") . lookupEnvVar "COLORTERM")
+    const
+  termWidthL =
+    let parseColumn = maybe 80 id . join . fmap (readMaybe . T.unpack)
+     in lens (parseColumn . lookupEnvVar "COLUMNS") const
+
 
 displayWithColor
     :: (HasTerm env, Pretty a, MonadReader env m, HasCallStack)
