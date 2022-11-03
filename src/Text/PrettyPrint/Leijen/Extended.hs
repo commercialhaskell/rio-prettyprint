@@ -24,7 +24,7 @@ module Text.PrettyPrint.Leijen.Extended
   --
   -- See "System.Console.ANSI" for 'SGR' values to use beyond the colors
   -- provided.
-  StyleDoc, StyleAnn(..),
+  StyleDoc (..), StyleAnn(..),
   -- hDisplayAnsi,
   displayAnsi, displayPlain, renderDefault,
 
