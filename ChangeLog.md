@@ -1,5 +1,9 @@
 # Changelog for rio-prettyprint
 
+## 0.1.2.0
+
+* Expose data constructor of StyleDoc [#8](https://github.com/commercialhaskell/rio-prettyprint/pull/8)
+
 ## 0.1.1.0
 
 * Add `Debug`, `Info` and `OtherLevel` data constructors to type `Style` (intended to be used like the existing `Warning` and `Error` constructors) and a `logLevelToStyle` function.
