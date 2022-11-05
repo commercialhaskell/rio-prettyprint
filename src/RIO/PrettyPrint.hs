@@ -24,7 +24,7 @@ module RIO.PrettyPrint
     , spacedBulletedList
     , debugBracket
       -- * Re-exports from "Text.PrettyPrint.Leijen.Extended"
-    , Pretty (..), StyleDoc, StyleAnn (..)
+    , Pretty (..), StyleDoc (..), StyleAnn (..)
     , nest, line, linebreak, group, softline, softbreak
     , align, hang, indent, encloseSep
     , (<+>)
