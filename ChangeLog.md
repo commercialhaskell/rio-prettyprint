@@ -1,5 +1,12 @@
 # Changelog for rio-prettyprint
 
+## 0.1.3.0
+
+* Add `SimplePrettyApp`, `mkSimplePrettyApp` and `runSimplePrettyApp`, which
+  facilitate the provision, and use, of a basic environment including pretty
+  printing functionality.
+* Add `PrettyException` representing pretty exceptions.
+
 ## 0.1.2.0
 
 * Expose data constructor of StyleDoc [#8](https://github.com/commercialhaskell/rio-prettyprint/pull/8)
