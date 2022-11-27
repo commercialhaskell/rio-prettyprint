@@ -86,11 +86,12 @@ module Text.PrettyPrint.Leijen.Extended
   -- @
 
   -- ** Primitive type documents
-  -- Entirely omitted:
+  -- Omitted compared to the original:
   --
   -- @
-  -- string, int, integer, float, double, rational, bool,
+  -- int, integer, float, double, rational, bool,
   -- @
+  string,
 
   -- ** Semantic annotations
   annotate, noAnnotate, styleAnn
@@ -385,6 +386,17 @@ squotes = StyleDoc . P.squotes . unStyleDoc
 
 brackets :: StyleDoc -> StyleDoc
 brackets = StyleDoc . P.brackets . unStyleDoc
+
+-- | The document @string s@ concatenates all characters in @s@ using @line@ for
+-- newline characters and @char@ for all other characters. It is used whenever
+-- the text contains newline characters.
+--
+-- @since 0.2.0.0
+string :: String -> StyleDoc
+string "" = mempty
+string ('\n':s) = line <> string s
+string s        = let (xs, ys) = span (/='\n') s
+                  in  fromString xs <> string ys
 
 annotate :: StyleAnn -> StyleDoc -> StyleDoc
 annotate a = StyleDoc . P.annotate a . unStyleDoc

@@ -1,5 +1,9 @@
 # Changelog for rio-prettyprint
 
+## 0.2.0.0
+
+* Add `string` and `mkNarrativeList`.
+
 ## 0.1.3.0
 
 * Add `SimplePrettyApp`, `mkSimplePrettyApp` and `runSimplePrettyApp`, which
