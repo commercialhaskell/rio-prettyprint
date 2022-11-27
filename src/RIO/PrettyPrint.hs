@@ -178,7 +178,7 @@ bulletedList = mconcat . intersperse line . map (("*" <+>) . align)
 -- @\"apple, ball and cat.\"@ (no serial comma) or @\"apple, ball, and cat.\"@
 -- (serial comma) from @[\"apple\", \"ball\", \"cat\"]@.
 --
--- @since 0.2.0.0
+-- @since 0.1.4.0
 mkNarrativeList :: Pretty a
                 => Maybe Style
                 -- ^ Style the items in the list?

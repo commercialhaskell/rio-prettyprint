@@ -391,7 +391,7 @@ brackets = StyleDoc . P.brackets . unStyleDoc
 -- newline characters and @char@ for all other characters. It is used whenever
 -- the text contains newline characters.
 --
--- @since 0.2.0.0
+-- @since 0.1.4.0
 string :: String -> StyleDoc
 string "" = mempty
 string ('\n':s) = line <> string s
