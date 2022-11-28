@@ -21,6 +21,7 @@ module RIO.PrettyPrint
     , logLevelToStyle
       -- * Formatting utils
     , bulletedList
+    , mkNarrativeList
     , spacedBulletedList
     , debugBracket
       -- * Re-exports from "Text.PrettyPrint.Leijen.Extended"
@@ -31,6 +32,7 @@ module RIO.PrettyPrint
     , hsep, vsep, fillSep, sep, hcat, vcat, fillCat, cat, punctuate
     , fill, fillBreak
     , enclose, squotes, dquotes, parens, angles, braces, brackets
+    , string
     , indentAfterLabel, wordDocs, flow
       -- * Re-exports from "RIO.PrettyPrint.Types.PrettyPrint"
     , Style (..)
@@ -47,7 +49,7 @@ import Text.PrettyPrint.Leijen.Extended (Pretty (pretty),
                      fill, fillBreak, fillCat, fillSep, group, hang, hcat, hsep,
                      indent, line, linebreak,
                      nest, parens, punctuate, sep, softbreak, softline, squotes,
-                     styleAnn, vcat, vsep)
+                     string, styleAnn, vcat, vsep)
 
 class (HasLogFunc env, HasStylesUpdate env) => HasTerm env where
   useColorL :: Lens' env Bool
@@ -170,6 +172,31 @@ displayMilliseconds t = style Good $
 -- | Display a bulleted list of 'StyleDoc'.
 bulletedList :: [StyleDoc] -> StyleDoc
 bulletedList = mconcat . intersperse line . map (("*" <+>) . align)
+
+-- | A helper function to yield a narrative list from a list of items, with a
+-- final fullstop. For example, helps produce the output
+-- @\"apple, ball and cat.\"@ (no serial comma) or @\"apple, ball, and cat.\"@
+-- (serial comma) from @[\"apple\", \"ball\", \"cat\"]@.
+--
+-- @since 0.2.0.0
+mkNarrativeList :: Pretty a
+                => Maybe Style
+                -- ^ Style the items in the list?
+                -> Bool
+                -- ^ Use a serial comma?
+                -> [a]
+                -> [StyleDoc]
+mkNarrativeList _ _ [] = []
+mkNarrativeList mStyle _ [x] = [maybe id style mStyle (pretty x) <> "."]
+mkNarrativeList mStyle useSerialComma [x1, x2] =
+      mStyle' (pretty x1) <> (if useSerialComma then "," else mempty)
+    : "and"
+    : mkNarrativeList mStyle useSerialComma [x2]
+  where
+    mStyle' = maybe id style mStyle
+mkNarrativeList mStyle useSerialComma (x:xs) =
+      maybe id style mStyle (pretty x) <> ","
+    : mkNarrativeList mStyle useSerialComma xs
 
 -- | Display a bulleted list of 'StyleDoc' with a blank line between
 -- each.

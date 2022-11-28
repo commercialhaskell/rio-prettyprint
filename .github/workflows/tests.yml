@@ -13,10 +13,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os:
+        # As of 27 November 2022, ubuntu-lastest corresponds to ubuntu-20.04.
+        # However, ubuntu-20.04 has package 'libc6 (2.31-0ubuntu9.7 and others)'
+        # and, from GHC 9.4.1, ghc-9.4.1-x86_64-fedora33-linux.tar.xz etc is
+        # built on Fedora 33, whuch comes with glibc version 2.32. Hence use
+        # ubuntu-22.04.
+        - ubuntu-22.04
+        - macos-latest
+        - windows-latest
         resolver:
-        - nightly-2022-11-03 # GHC 9.2.4
-        - lts-19.31 # GHC 9.0.2
+        - nightly-2022-11-26 # GHC 9.4.3
+        - lts-20.1 # GHC 9.2.5
+        - lts-19.33 # GHC 9.0.2
         - lts-18.28 # GHC 8.10.7
     steps:
     - name: Clone project
