@@ -1,8 +1,10 @@
 # Changelog for rio-prettyprint
 
-## 0.2.0.0
+## 0.1.4.0
 
 * Add `string` and `mkNarrativeList`.
+* The `Show` instance of `PrettyException` is now derived. `displayException` is
+  now defined, as the `displayException` of the inner exception.
 
 ## 0.1.3.0
 
