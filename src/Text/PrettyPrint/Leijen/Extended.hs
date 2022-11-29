@@ -174,7 +174,7 @@ instance Monoid StyleAnn where
 
 -- |A document annotated by a style
 newtype StyleDoc = StyleDoc { unStyleDoc :: Doc StyleAnn }
-  deriving IsString
+  deriving (IsString, Show)
 
 -- |An ANSI code(s) annotation.
 newtype AnsiAnn = AnsiAnn [SGR]
