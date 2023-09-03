@@ -1,15 +1,15 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE NoImplicitPrelude          #-}
+{-# LANGUAGE DefaultSignatures          #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE RankNTypes                 #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE UndecidableInstances       #-}
 
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE UndecidableInstances #-}
 -- | This module re-exports some of the interface for
 -- "Text.PrettyPrint.Annotated.Leijen" along with additional definitions
 -- useful for stack.
@@ -17,16 +17,19 @@
 -- It defines a 'Monoid' instance for 'Doc'.
 module Text.PrettyPrint.Leijen.Extended
   (
-  -- * Pretty-print typeclass
-  Pretty (..),
+    -- * Pretty-print typeclass
+    Pretty (..)
 
-  -- * Ansi terminal Doc
-  --
-  -- See "System.Console.ANSI" for 'SGR' values to use beyond the colors
-  -- provided.
-  StyleDoc (..), StyleAnn(..),
+    -- * Ansi terminal Doc
+    --
+    -- See "System.Console.ANSI" for 'SGR' values to use beyond the colors
+    -- provided.
+  , StyleDoc (..)
+  , StyleAnn(..)
   -- hDisplayAnsi,
-  displayAnsi, displayPlain, renderDefault,
+  , displayAnsi
+  , displayPlain
+  , renderDefault
 
   -- * Selective re-exports from "Text.PrettyPrint.Annotated.Leijen"
   --
@@ -44,7 +47,12 @@ module Text.PrettyPrint.Leijen.Extended
   -- Instead of @text@ and @char@, use 'fromString'.
   --
   -- Instead of @empty@, use 'mempty'.
-  nest, line, linebreak, group, softline, softbreak,
+  , nest
+  , line
+  , linebreak
+  , group
+  , softline
+  , softbreak
 
   -- ** Alignment
   --
@@ -60,41 +68,61 @@ module Text.PrettyPrint.Leijen.Extended
   -- for let expressions is fine.
   --
   -- Omitted compared to original: @list, tupled, semiBraces@
-  align, hang, indent, encloseSep,
+  , align
+  , hang
+  , indent
+  , encloseSep
 
   -- ** Operators
   --
   -- Omitted compared to original: @(<$>), (</>), (<$$>), (<//>)@
-  (<+>),
+  , (<+>)
 
-  -- ** List combinators
-  hsep, vsep, fillSep, sep, hcat, vcat, fillCat, cat, punctuate,
+    -- ** List combinators
+  , hsep
+  , vsep
+  , fillSep
+  , sep
+  , hcat
+  , vcat
+  , fillCat
+  , cat
+  , punctuate
 
-  -- ** Fillers
-  fill, fillBreak,
+    -- ** Fillers
+  , fill
+  , fillBreak
 
-  -- ** Bracketing combinators
-  enclose, squotes, dquotes, parens, angles, braces, brackets,
+    -- ** Bracketing combinators
+  , enclose
+  , squotes
+  , dquotes
+  , parens
+  , angles
+  , braces
+  , brackets
 
-  -- ** Character documents
-  -- Entirely omitted:
-  --
-  -- @
-  -- lparen, rparen, langle, rangle, lbrace, rbrace, lbracket, rbracket,
-  -- squote, dquote, semi, colon, comma, space, dot, backslash, equals,
-  -- pipe
-  -- @
+    -- ** Character documents
+    -- Entirely omitted:
+    --
+    -- @
+    -- lparen, rparen, langle, rangle, lbrace, rbrace, lbracket, rbracket,
+    -- squote, dquote, semi, colon, comma, space, dot, backslash, equals,
+    -- pipe
+    -- @
 
-  -- ** Primitive type documents
-  -- Omitted compared to the original:
-  --
-  -- @
-  -- int, integer, float, double, rational, bool,
-  -- @
-  string,
+    -- ** Primitive type documents
+    -- Omitted compared to the original:
+    --
+    -- @
+    -- int, integer, float, double, rational, bool,
+    -- @
+  , string
 
-  -- ** Semantic annotations
-  annotate, noAnnotate, styleAnn
+    -- ** Semantic annotations
+  , annotate
+  , noAnnotate
+  , styleAnn
 
   -- ** Rendering
   -- Original entirely omitted:
@@ -110,22 +138,21 @@ module Text.PrettyPrint.Leijen.Extended
   -- @
   ) where
 
-import Control.Monad.Reader (runReader, local)
-import Data.Array.IArray ((!), (//))
+import           Control.Monad.Reader ( local, runReader )
+import           Data.Array.IArray ( (!), (//) )
 import qualified Data.Text as T
-import Distribution.ModuleName (ModuleName)
-import qualified Distribution.Text (display)
-import Path (Dir, File, Path, SomeBase, prjSomeBase, toFilePath)
-import RIO
+import           Distribution.ModuleName ( ModuleName )
+import qualified Distribution.Text ( display )
+import           Path ( Dir, File, Path, SomeBase, prjSomeBase, toFilePath )
+import           RIO
 import qualified RIO.Map as M
-import RIO.PrettyPrint.DefaultStyles (defaultStyles)
-import RIO.PrettyPrint.Types (Style (Dir, File), Styles)
-import RIO.PrettyPrint.StylesUpdate (StylesUpdate (..), HasStylesUpdate, stylesUpdateL)
-import System.Console.ANSI (ConsoleLayer (..), SGR (..), setSGRCode)
+import           RIO.PrettyPrint.DefaultStyles ( defaultStyles )
+import           RIO.PrettyPrint.Types ( Style (Dir, File), Styles )
+import           RIO.PrettyPrint.StylesUpdate
+                   ( HasStylesUpdate, StylesUpdate (..), stylesUpdateL )
+import           System.Console.ANSI ( ConsoleLayer (..), SGR (..), setSGRCode )
 import qualified Text.PrettyPrint.Annotated.Leijen as P
-import Text.PrettyPrint.Annotated.Leijen
-  ( Doc, SimpleDoc (..)
-  )
+import           Text.PrettyPrint.Annotated.Leijen ( Doc, SimpleDoc (..) )
 
 -- TODO: consider smashing together the code for wl-annotated-pprint and
 -- wl-pprint-text. The code here already handles doing the
@@ -136,47 +163,48 @@ import Text.PrettyPrint.Annotated.Leijen
 -- parameter to Doc?
 
 instance Semigroup StyleDoc where
-    StyleDoc x <> StyleDoc y = StyleDoc (x P.<> y)
+  StyleDoc x <> StyleDoc y = StyleDoc (x P.<> y)
+
 instance Monoid StyleDoc where
-    mappend = (<>)
-    mempty = StyleDoc P.empty
+  mappend = (<>)
+  mempty = StyleDoc P.empty
 
 --------------------------------------------------------------------------------
 -- Pretty-Print class
 
 class Pretty a where
-    pretty :: a -> StyleDoc
-    default pretty :: Show a => a -> StyleDoc
-    pretty = StyleDoc . fromString . show
+  pretty :: a -> StyleDoc
+  default pretty :: Show a => a -> StyleDoc
+  pretty = StyleDoc . fromString . show
 
 instance Pretty StyleDoc where
-    pretty = id
+  pretty = id
 
 instance Pretty (Path b File) where
-    pretty = styleAnn File . StyleDoc . fromString . toFilePath
+  pretty = styleAnn File . StyleDoc . fromString . toFilePath
 
 instance Pretty (Path b Dir) where
-    pretty = styleAnn Dir . StyleDoc . fromString . toFilePath
+  pretty = styleAnn Dir . StyleDoc . fromString . toFilePath
 
 instance Pretty (SomeBase File) where
-    pretty = prjSomeBase pretty
+  pretty = prjSomeBase pretty
 
 instance Pretty (SomeBase Dir) where
-    pretty = prjSomeBase pretty
+  pretty = prjSomeBase pretty
 
 instance Pretty ModuleName where
-    pretty = StyleDoc . fromString . Distribution.Text.display
+  pretty = StyleDoc . fromString . Distribution.Text.display
 
 --------------------------------------------------------------------------------
 -- Style Doc
 
 -- |A style annotation.
 newtype StyleAnn = StyleAnn (Maybe Style)
-    deriving (Eq, Show, Semigroup)
+  deriving (Eq, Show, Semigroup)
 
 instance Monoid StyleAnn where
-    mempty = StyleAnn Nothing
-    mappend = (<>)
+  mempty = StyleAnn Nothing
+  mappend = (<>)
 
 -- |A document annotated by a style
 newtype StyleDoc = StyleDoc { unStyleDoc :: Doc StyleAnn }
@@ -184,28 +212,29 @@ newtype StyleDoc = StyleDoc { unStyleDoc :: Doc StyleAnn }
 
 -- |An ANSI code(s) annotation.
 newtype AnsiAnn = AnsiAnn [SGR]
-    deriving (Eq, Show, Semigroup, Monoid)
+  deriving (Eq, Show, Semigroup, Monoid)
 
 -- |Convert a 'SimpleDoc' annotated with 'StyleAnn' to one annotated with
 -- 'AnsiAnn', by reference to a 'Styles'.
 toAnsiDoc :: Styles -> SimpleDoc StyleAnn -> SimpleDoc AnsiAnn
 toAnsiDoc styles = go
-  where
-    go SEmpty        = SEmpty
-    go (SChar c d)   = SChar c (go d)
-    go (SText l s d) = SText l s (go d)
-    go (SLine i d)   = SLine i (go d)
-    go (SAnnotStart (StyleAnn (Just s)) d) =
-        SAnnotStart (AnsiAnn (snd $ styles ! s)) (go d)
-    go (SAnnotStart (StyleAnn Nothing) d) = SAnnotStart (AnsiAnn []) (go d)
-    go (SAnnotStop d) = SAnnotStop (go d)
+ where
+  go SEmpty        = SEmpty
+  go (SChar c d)   = SChar c (go d)
+  go (SText l s d) = SText l s (go d)
+  go (SLine i d)   = SLine i (go d)
+  go (SAnnotStart (StyleAnn (Just s)) d) =
+    SAnnotStart (AnsiAnn (snd $ styles ! s)) (go d)
+  go (SAnnotStart (StyleAnn Nothing) d) = SAnnotStart (AnsiAnn []) (go d)
+  go (SAnnotStop d) = SAnnotStop (go d)
 
-displayPlain
-    :: (Pretty a, HasLogFunc env, HasStylesUpdate env,
-        MonadReader env m, HasCallStack)
-    => Int -> a -> m Utf8Builder
+displayPlain ::
+     ( Pretty a, HasLogFunc env, HasStylesUpdate env, MonadReader env m
+     , HasCallStack
+     )
+  => Int -> a -> m Utf8Builder
 displayPlain w =
-    displayAnsiSimple . renderDefault w . fmap (const mempty) . unStyleDoc . pretty
+  displayAnsiSimple . renderDefault w . fmap (const mempty) . unStyleDoc . pretty
 
 -- TODO: tweak these settings more?
 -- TODO: options for settings if this is released as a lib
@@ -213,12 +242,13 @@ displayPlain w =
 renderDefault :: Int -> Doc a -> SimpleDoc a
 renderDefault = P.renderPretty 1
 
-displayAnsi
-    :: (Pretty a, HasLogFunc env, HasStylesUpdate env,
-        MonadReader env m, HasCallStack)
-    => Int -> a -> m Utf8Builder
+displayAnsi ::
+     ( Pretty a, HasLogFunc env, HasStylesUpdate env, MonadReader env m
+     , HasCallStack
+     )
+  => Int -> a -> m Utf8Builder
 displayAnsi w =
-    displayAnsiSimple . renderDefault w . unStyleDoc . pretty
+  displayAnsiSimple . renderDefault w . unStyleDoc . pretty
 
 {- Not used --------------------------------------------------------------------
 
@@ -231,66 +261,68 @@ hDisplayAnsi h w x = liftIO $ do
 
 -}
 
-displayAnsiSimple
-    :: (HasLogFunc env, HasStylesUpdate env, MonadReader env m, HasCallStack)
-    => SimpleDoc StyleAnn -> m Utf8Builder
+displayAnsiSimple ::
+     (HasLogFunc env, HasStylesUpdate env, MonadReader env m, HasCallStack)
+  => SimpleDoc StyleAnn
+  -> m Utf8Builder
 displayAnsiSimple doc = do
-    update <- view stylesUpdateL
-    let styles = defaultStyles // stylesUpdate update
-        doc' = toAnsiDoc styles doc
-    return $
-        flip runReader mempty $ displayDecoratedWrap go doc'
-  where
-    go (AnsiAnn sgrs) inner = do
-        old <- ask
-        let sgrs' = mapMaybe (\sgr -> if sgr == Reset
-                                        then Nothing
-                                        else Just (getSGRTag sgr, sgr)) sgrs
-            new = if Reset `elem` sgrs
-                      then M.fromList sgrs'
-                      else foldl' (\mp (tag, sgr) -> M.insert tag sgr mp) old sgrs'
-        (extra, contents) <- local (const new) inner
-        return (extra, transitionCodes old new <> contents <> transitionCodes new old)
-    transitionCodes old new =
-        case (null removals, null additions) of
-            (True, True) -> mempty
-            (True, False) -> fromString (setSGRCode additions)
-            (False, _) -> fromString (setSGRCode (Reset : M.elems new))
-      where
-        (removals, additions) = partitionEithers $ M.elems $
-            M.mergeWithKey
-               (\_ o n -> if o == n then Nothing else Just (Right n))
-               (fmap Left)
-               (fmap Right)
-               old
-               new
+  update <- view stylesUpdateL
+  let styles = defaultStyles // stylesUpdate update
+      doc' = toAnsiDoc styles doc
+  return $ flip runReader mempty $ displayDecoratedWrap go doc'
+ where
+  go (AnsiAnn sgrs) inner = do
+    old <- ask
+    let sgrs' = mapMaybe (\sgr -> if sgr == Reset
+                                    then Nothing
+                                    else Just (getSGRTag sgr, sgr)) sgrs
+        new = if Reset `elem` sgrs
+                then M.fromList sgrs'
+                else foldl' (\mp (tag, sgr) -> M.insert tag sgr mp) old sgrs'
+    (extra, contents) <- local (const new) inner
+    return (extra, transitionCodes old new <> contents <> transitionCodes new old)
+  transitionCodes old new =
+    case (null removals, null additions) of
+      (True, True) -> mempty
+      (True, False) -> fromString (setSGRCode additions)
+      (False, _) -> fromString (setSGRCode (Reset : M.elems new))
+   where
+    (removals, additions) = partitionEithers $ M.elems $
+      M.mergeWithKey
+        (\_ o n -> if o == n then Nothing else Just (Right n))
+        (fmap Left)
+        (fmap Right)
+        old
+        new
 
-displayDecoratedWrap
-    :: forall a m. Monad m
-    => (forall b. a -> m (b, Utf8Builder) -> m (b, Utf8Builder))
-    -> SimpleDoc a
-    -> m Utf8Builder
+displayDecoratedWrap ::
+     forall a m. Monad m
+  => (forall b. a -> m (b, Utf8Builder) -> m (b, Utf8Builder))
+  -> SimpleDoc a
+  -> m Utf8Builder
 displayDecoratedWrap f doc = do
-    (mafter, result) <- go doc
-    case mafter of
-      Just _ -> error "Invariant violated by input to displayDecoratedWrap: no matching SAnnotStart for SAnnotStop."
-      Nothing -> return result
-  where
-    spaces n = display (T.replicate n " ")
+  (mafter, result) <- go doc
+  case mafter of
+    Just _ -> error "Invariant violated by input to displayDecoratedWrap: no \
+                    \matching SAnnotStart for SAnnotStop."
+    Nothing -> return result
+ where
+  spaces n = display (T.replicate n " ")
 
-    go :: SimpleDoc a -> m (Maybe (SimpleDoc a), Utf8Builder)
-    go SEmpty = return (Nothing, mempty)
-    go (SChar c x) = fmap (fmap (display c <>)) (go x)
-    -- NOTE: Could actually use the length to guess at an initial
-    -- allocation.  Better yet would be to just use Text in pprint..
-    go (SText _l s x) = fmap (fmap (fromString s <>)) (go x)
-    go (SLine n x) = fmap (fmap ((display '\n' <>) . (spaces n <>))) (go x)
-    go (SAnnotStart ann x) = do
-        (mafter, contents) <- f ann (go x)
-        case mafter of
-            Just after -> fmap (fmap (contents <>)) (go after)
-            Nothing -> error "Invariant violated by input to displayDecoratedWrap: no matching SAnnotStop for SAnnotStart."
-    go (SAnnotStop x) = return (Just x, mempty)
+  go :: SimpleDoc a -> m (Maybe (SimpleDoc a), Utf8Builder)
+  go SEmpty = return (Nothing, mempty)
+  go (SChar c x) = fmap (fmap (display c <>)) (go x)
+  -- NOTE: Could actually use the length to guess at an initial
+  -- allocation.  Better yet would be to just use Text in pprint..
+  go (SText _l s x) = fmap (fmap (fromString s <>)) (go x)
+  go (SLine n x) = fmap (fmap ((display '\n' <>) . (spaces n <>))) (go x)
+  go (SAnnotStart ann x) = do
+    (mafter, contents) <- f ann (go x)
+    case mafter of
+      Just after -> fmap (fmap (contents <>)) (go after)
+      Nothing -> error "Invariant violated by input to displayDecoratedWrap: \
+                       \no matching SAnnotStop for SAnnotStart."
+  go (SAnnotStop x) = return (Just x, mempty)
 
 {- Not used --------------------------------------------------------------------
 
@@ -340,18 +372,18 @@ normal = ansiAnn [SetConsoleIntensity NormalIntensity]
 --
 -- It's a bit of a hack that 'TagReset' is included.
 data SGRTag
-    = TagReset
-    | TagConsoleIntensity
-    | TagItalicized
-    | TagUnderlining
-    | TagBlinkSpeed
-    | TagVisible
-    | TagSwapForegroundBackground
-    | TagColorForeground
-    | TagColorBackground
-    | TagRGBColor
-    | TagPaletteColor
-    deriving (Eq, Ord)
+  = TagReset
+  | TagConsoleIntensity
+  | TagItalicized
+  | TagUnderlining
+  | TagBlinkSpeed
+  | TagVisible
+  | TagSwapForegroundBackground
+  | TagColorForeground
+  | TagColorBackground
+  | TagRGBColor
+  | TagPaletteColor
+  deriving (Eq, Ord)
 
 getSGRTag :: SGR -> SGRTag
 getSGRTag Reset{}                       = TagReset

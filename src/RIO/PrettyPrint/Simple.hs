@@ -10,18 +10,20 @@ module RIO.PrettyPrint.Simple
   , runSimplePrettyApp
   ) where
 
-import System.Environment (lookupEnv)
-
-import RIO
-         ( Bool (..), HasLogFunc (..), Int, LogFunc, Maybe (..), MonadIO, RIO
-         , ($), (<$>), isJust, lens, liftIO, logOptionsHandle, maybe, pure
-         , runRIO, setLogUseColor, stderr, withLogFunc
-         )
-import RIO.Process
-         ( HasProcessContext (..), ProcessContext, mkDefaultProcessContext )
-
-import RIO.PrettyPrint (HasTerm (..))
-import RIO.PrettyPrint.StylesUpdate (HasStylesUpdate (..), StylesUpdate (..))
+import           RIO
+                   ( Bool (..), HasLogFunc (..), Int, LogFunc, Maybe (..)
+                   , MonadIO, RIO, ($), (<$>), isJust, lens, liftIO
+                   , logOptionsHandle, maybe, pure, runRIO, setLogUseColor
+                   , stderr, withLogFunc
+                   )
+import           RIO.PrettyPrint ( HasTerm (..) )
+import           RIO.PrettyPrint.StylesUpdate
+                   ( HasStylesUpdate (..), StylesUpdate (..) )
+import           RIO.Process
+                   ( HasProcessContext (..), ProcessContext
+                   , mkDefaultProcessContext
+                   )
+import           System.Environment ( lookupEnv )
 
 -- | A simple, non-customizable environment type, which provides
 -- pretty printing functionality.
@@ -52,8 +54,8 @@ instance HasTerm SimplePrettyApp where
 -- 'mkDefaultProcessContext' will be used to create it.
 --
 -- @since 0.1.3.0
-mkSimplePrettyApp
-  :: MonadIO m
+mkSimplePrettyApp ::
+     MonadIO m
   => LogFunc
   -> Maybe ProcessContext
   -> Bool
@@ -83,8 +85,8 @@ mkSimplePrettyApp logFunc mProcessContext useColor termWidth stylesUpdate = do
 -- * Logging using color
 --
 -- @since 0.1.3.0
-runSimplePrettyApp
-  :: MonadIO m
+runSimplePrettyApp ::
+     MonadIO m
   => Int
      -- ^ Terminal width
   -> StylesUpdate

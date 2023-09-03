@@ -1,28 +1,29 @@
 {-# LANGUAGE NoImplicitPrelude          #-}
 
 module RIO.PrettyPrint.StylesUpdate
-  (
-    StylesUpdate (..)
+  ( StylesUpdate (..)
   , parseStylesUpdateFromString
   , HasStylesUpdate (..)
   ) where
 
-import Data.Aeson (FromJSON(..), withText)
-import Data.Array.IArray (assocs)
-import Data.Colour.SRGB (Colour, sRGB24)
-import Data.Text as T (pack, unpack)
-import RIO
-import RIO.PrettyPrint.DefaultStyles (defaultStyles)
-import RIO.PrettyPrint.Types (Style, StyleSpec)
-import System.Console.ANSI.Types (BlinkSpeed (..), Color (..),
-         ColorIntensity (..), ConsoleIntensity (..), ConsoleLayer (..),
-         SGR (..), Underlining (..))
+import           Data.Aeson ( FromJSON (..), withText )
+import           Data.Array.IArray ( assocs )
+import           Data.Colour.SRGB ( Colour, sRGB24 )
+import           Data.Text as T ( pack, unpack )
+import           RIO
+import           RIO.PrettyPrint.DefaultStyles ( defaultStyles )
+import           RIO.PrettyPrint.Types ( Style, StyleSpec )
+import           System.Console.ANSI.Types
+                   ( BlinkSpeed (..), Color (..), ColorIntensity (..)
+                   , ConsoleIntensity (..), ConsoleLayer (..), SGR (..)
+                   , Underlining (..)
+                   )
 
--- |Updates to 'Styles'
+-- | Updates to 'Styles'
 newtype StylesUpdate = StylesUpdate { stylesUpdate :: [(Style, StyleSpec)] }
   deriving (Eq, Show)
 
--- |The first styles update overrides the second one.
+-- | The first styles update overrides the second one.
 instance Semigroup StylesUpdate where
   -- See module "Data.IArray.Array" of package @array@: this depends on GHC's
   -- implementation of '(//)' being such that the last value specified for a
@@ -79,10 +80,10 @@ parseCodes' c = case codeToSGR c of
 
 split :: Char -> String -> [String]
 split c s = case rest of
-                []     -> [chunk]
-                _:rest1 -> chunk : split c rest1
-  where
-    (chunk, rest) = break (==c) s
+  []     -> [chunk]
+  _:rest1 -> chunk : split c rest1
+ where
+  (chunk, rest) = break (==c) s
 
 -- |This function is, essentially, the inverse of 'sgrToCode' exported by
 -- module "System.Console.ANSI.Codes" of the @ansi-terminal@ package. The
