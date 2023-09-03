@@ -115,7 +115,7 @@ import Data.Array.IArray ((!), (//))
 import qualified Data.Text as T
 import Distribution.ModuleName (ModuleName)
 import qualified Distribution.Text (display)
-import Path
+import Path (Dir, File, Path, SomeBase, prjSomeBase, toFilePath)
 import RIO
 import qualified RIO.Map as M
 import RIO.PrettyPrint.DefaultStyles (defaultStyles)
@@ -157,6 +157,12 @@ instance Pretty (Path b File) where
 
 instance Pretty (Path b Dir) where
     pretty = styleAnn Dir . StyleDoc . fromString . toFilePath
+
+instance Pretty (SomeBase File) where
+    pretty = prjSomeBase pretty
+
+instance Pretty (SomeBase Dir) where
+    pretty = prjSomeBase pretty
 
 instance Pretty ModuleName where
     pretty = StyleDoc . fromString . Distribution.Text.display

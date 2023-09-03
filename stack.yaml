@@ -1,2 +1,1 @@
-# For GHC 9.4.6
-resolver: lts-21.9
+resolver: stack-ghc-9.4.6.yaml

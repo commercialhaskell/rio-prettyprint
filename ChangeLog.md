@@ -1,5 +1,9 @@
 # Changelog for rio-prettyprint
 
+## 0.1.5.0
+
+* Add `Pretty` instances for `SomeBase Dir` and `SomeBase File`.
+
 ## 0.1.4.0
 
 * Add `string` and `mkNarrativeList`.
