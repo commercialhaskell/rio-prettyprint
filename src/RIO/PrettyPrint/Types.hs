@@ -6,19 +6,18 @@ names. When they do, import the module qualified. For example:
 > import qualified RIO.PrettyPrint.Types.PrettyPrint as PP
 -}
 module RIO.PrettyPrint.Types
-  (
-    Style (..)
+  ( Style (..)
   , Styles
   , StyleSpec
   ) where
 
-import Data.Array.IArray (Array)
-import Data.Ix (Ix)
-import Data.Text (Text)
-import RIO
-import System.Console.ANSI.Types (SGR)
+import           Data.Array.IArray ( Array )
+import           Data.Ix ( Ix )
+import           Data.Text ( Text )
+import           RIO
+import           System.Console.ANSI.Types ( SGR )
 
--- |A style of rio-prettyprint's output.
+-- | A style of rio-prettyprint's output.
 data Style
   = Error     -- Should be used sparingly, not to style entire long messages.
               -- For example, it's used to style the "Error:" or "[error]" label
@@ -58,13 +57,13 @@ data Style
               -- process in ... ms" message.
   deriving (Bounded, Enum, Eq, Ix, Ord, Show)
 
--- |The first style overrides the second.
+-- | The first style overrides the second.
 instance Semigroup Style where
   s <> _ = s
 
--- |A style specification, pairing its \'key\' with the corresponding list of
+-- | A style specification, pairing its \'key\' with the corresponding list of
 -- 'SGR' codes.
 type StyleSpec = (Text, [SGR])
 
--- |Style specifications indexed by the style.
+-- | Style specifications indexed by the style.
 type Styles = Array Style StyleSpec

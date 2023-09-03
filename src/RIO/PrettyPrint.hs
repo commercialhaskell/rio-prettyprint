@@ -1,73 +1,124 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module RIO.PrettyPrint
-    (
-      -- * Type classes for optionally colored terminal output
-      HasTerm (..), HasStylesUpdate (..)
-      -- * Pretty printing functions
-    , displayPlain, displayWithColor
-      -- * Logging based on pretty-print typeclass
-    , prettyDebug, prettyInfo, prettyNote, prettyWarn, prettyError, prettyWarnNoIndent, prettyErrorNoIndent
-    , prettyDebugL, prettyInfoL, prettyNoteL, prettyWarnL, prettyErrorL, prettyWarnNoIndentL, prettyErrorNoIndentL
-    , prettyDebugS, prettyInfoS, prettyNoteS, prettyWarnS, prettyErrorS, prettyWarnNoIndentS, prettyErrorNoIndentS
-      -- * Semantic styling functions
-      -- | These are used rather than applying colors or other styling directly,
-      -- to provide consistency.
-    , style
-    , displayMilliseconds
-    , logLevelToStyle
-      -- * Formatting utils
-    , bulletedList
-    , mkNarrativeList
-    , spacedBulletedList
-    , debugBracket
-      -- * Re-exports from "Text.PrettyPrint.Leijen.Extended"
-    , Pretty (..), StyleDoc (..), StyleAnn (..)
-    , nest, line, linebreak, group, softline, softbreak
-    , align, hang, indent, encloseSep
-    , (<+>)
-    , hsep, vsep, fillSep, sep, hcat, vcat, fillCat, cat, punctuate
-    , fill, fillBreak
-    , enclose, squotes, dquotes, parens, angles, braces, brackets
-    , string
-    , indentAfterLabel, wordDocs, flow
-      -- * Re-exports from "RIO.PrettyPrint.Types.PrettyPrint"
-    , Style (..)
-    ) where
+  (
+    -- * Type classes for optionally colored terminal output
+    HasTerm (..)
+  , HasStylesUpdate (..)
+    -- * Pretty printing functions
+  , displayPlain
+  , displayWithColor
+    -- * Logging based on pretty-print typeclass
+  , prettyDebug
+  , prettyInfo
+  , prettyNote
+  , prettyWarn
+  , prettyError
+  , prettyWarnNoIndent
+  , prettyErrorNoIndent
+  , prettyDebugL
+  , prettyInfoL
+  , prettyNoteL
+  , prettyWarnL
+  , prettyErrorL
+  , prettyWarnNoIndentL
+  , prettyErrorNoIndentL
+  , prettyDebugS
+  , prettyInfoS
+  , prettyNoteS
+  , prettyWarnS
+  , prettyErrorS
+  , prettyWarnNoIndentS
+  , prettyErrorNoIndentS
+    -- * Semantic styling functions
+    -- | These are used rather than applying colors or other styling directly,
+    -- to provide consistency.
+  , style
+  , displayMilliseconds
+  , logLevelToStyle
+    -- * Formatting utils
+  , bulletedList
+  , mkNarrativeList
+  , spacedBulletedList
+  , debugBracket
+    -- * Re-exports from "Text.PrettyPrint.Leijen.Extended"
+  , Pretty (..)
+  , StyleDoc (..)
+  , StyleAnn (..)
+  , nest
+  , line
+  , linebreak
+  , group
+  , softline
+  , softbreak
+  , align
+  , hang
+  , indent
+  , encloseSep
+  , (<+>)
+  , hsep
+  , vsep
+  , fillSep
+  , sep
+  , hcat
+  , vcat
+  , fillCat
+  , cat
+  , punctuate
+  , fill
+  , fillBreak
+  , enclose
+  , squotes
+  , dquotes
+  , parens
+  , angles
+  , braces
+  , brackets
+  , string
+  , indentAfterLabel
+  , wordDocs
+  , flow
+    -- * Re-exports from "RIO.PrettyPrint.Types.PrettyPrint"
+  , Style (..)
+  ) where
 
-import Data.List (intersperse)
-import RIO
-import RIO.PrettyPrint.StylesUpdate (HasStylesUpdate (..))
-import RIO.PrettyPrint.Types (Style (..))
-import Text.PrettyPrint.Leijen.Extended (Pretty (pretty),
-                     StyleAnn (..), StyleDoc, (<+>), align,
-                     angles, braces, brackets, cat,
-                     displayAnsi, displayPlain, dquotes, enclose, encloseSep,
-                     fill, fillBreak, fillCat, fillSep, group, hang, hcat, hsep,
-                     indent, line, linebreak,
-                     nest, parens, punctuate, sep, softbreak, softline, squotes,
-                     string, styleAnn, vcat, vsep)
+import           Data.List ( intersperse )
+import           RIO
+import           RIO.PrettyPrint.StylesUpdate ( HasStylesUpdate (..) )
+import           RIO.PrettyPrint.Types ( Style (..) )
+import           Text.PrettyPrint.Leijen.Extended
+                   ( Pretty (pretty), StyleAnn (..), StyleDoc, (<+>), align
+                   , angles, braces, brackets, cat, displayAnsi, displayPlain
+                   , dquotes, enclose, encloseSep, fill, fillBreak, fillCat
+                   , fillSep, group, hang, hcat, hsep, indent, line, linebreak
+                   , nest, parens, punctuate, sep, softbreak, softline, squotes
+                   , string, styleAnn, vcat, vsep
+                   )
 
 class (HasLogFunc env, HasStylesUpdate env) => HasTerm env where
   useColorL :: Lens' env Bool
   termWidthL :: Lens' env Int
 
-displayWithColor
-    :: (HasTerm env, Pretty a, MonadReader env m, HasCallStack)
-    => a -> m Utf8Builder
+displayWithColor ::
+     (HasTerm env, Pretty a, MonadReader env m, HasCallStack)
+  => a
+  -> m Utf8Builder
 displayWithColor x = do
-    useAnsi <- view useColorL
-    termWidth <- view termWidthL
-    (if useAnsi then displayAnsi else displayPlain) termWidth x
+  useAnsi <- view useColorL
+  termWidth <- view termWidthL
+  (if useAnsi then displayAnsi else displayPlain) termWidth x
 
 -- TODO: switch to using implicit callstacks once 7.8 support is dropped
 
-prettyWith :: (HasTerm env, HasCallStack, Pretty b,
-               MonadReader env m, MonadIO m)
-           => LogLevel -> (a -> b) -> a -> m ()
+prettyWith ::
+     (HasTerm env, HasCallStack, Pretty b, MonadReader env m, MonadIO m)
+  => LogLevel
+  -> (a -> b)
+  -> a
+  -> m ()
 prettyWith level f = logGeneric "" level . RIO.display <=< displayWithColor . f
 
 -- Note: I think keeping this section aligned helps spot errors, might be
@@ -149,12 +200,16 @@ debugBracket msg f = do
   output $ "Start: " <> msg
   start <- getMonotonicTime
   x <- f `catch` \ex -> do
-      end <- getMonotonicTime
-      let diff = end - start
-      output $ "Finished with exception in" <+> displayMilliseconds diff <> ":" <+>
-          msg <> line <>
-          "Exception thrown: " <> fromString (show ex)
-      throwIO (ex :: SomeException)
+    end <- getMonotonicTime
+    let diff = end - start
+    output $
+         "Finished with exception in"
+      <+> displayMilliseconds diff <> ":"
+      <+> msg
+      <> line
+      <> "Exception thrown: "
+      <> fromString (show ex)
+    throwIO (ex :: SomeException)
   end <- getMonotonicTime
   let diff = end - start
   output $ "Finished in" <+> displayMilliseconds diff <> ":" <+> msg
@@ -167,7 +222,7 @@ style = styleAnn
 -- Display milliseconds.
 displayMilliseconds :: Double -> StyleDoc
 displayMilliseconds t = style Good $
-    fromString (show (round (t * 1000) :: Int)) <> "ms"
+  fromString (show (round (t * 1000) :: Int)) <> "ms"
 
 -- | Display a bulleted list of 'StyleDoc'.
 bulletedList :: [StyleDoc] -> StyleDoc
@@ -179,24 +234,25 @@ bulletedList = mconcat . intersperse line . map (("*" <+>) . align)
 -- (serial comma) from @[\"apple\", \"ball\", \"cat\"]@.
 --
 -- @since 0.1.4.0
-mkNarrativeList :: Pretty a
-                => Maybe Style
-                -- ^ Style the items in the list?
-                -> Bool
-                -- ^ Use a serial comma?
-                -> [a]
-                -> [StyleDoc]
+mkNarrativeList ::
+     Pretty a
+  => Maybe Style
+  -- ^ Style the items in the list?
+  -> Bool
+  -- ^ Use a serial comma?
+  -> [a]
+  -> [StyleDoc]
 mkNarrativeList _ _ [] = []
 mkNarrativeList mStyle _ [x] = [maybe id style mStyle (pretty x) <> "."]
 mkNarrativeList mStyle useSerialComma [x1, x2] =
-      mStyle' (pretty x1) <> (if useSerialComma then "," else mempty)
-    : "and"
-    : mkNarrativeList mStyle useSerialComma [x2]
-  where
-    mStyle' = maybe id style mStyle
+    mStyle' (pretty x1) <> (if useSerialComma then "," else mempty)
+  : "and"
+  : mkNarrativeList mStyle useSerialComma [x2]
+ where
+  mStyle' = maybe id style mStyle
 mkNarrativeList mStyle useSerialComma (x:xs) =
-      maybe id style mStyle (pretty x) <> ","
-    : mkNarrativeList mStyle useSerialComma xs
+    maybe id style mStyle (pretty x) <> ","
+  : mkNarrativeList mStyle useSerialComma xs
 
 -- | Display a bulleted list of 'StyleDoc' with a blank line between
 -- each.

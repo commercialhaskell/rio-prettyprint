@@ -58,8 +58,8 @@ module RIO.PrettyPrint.PrettyException
   ( PrettyException (..)
   ) where
 
-import RIO (Exception (..), Show, Typeable)
-import Text.PrettyPrint.Leijen.Extended (Pretty (..))
+import RIO ( Exception (..), Show, Typeable )
+import Text.PrettyPrint.Leijen.Extended ( Pretty (..) )
 
 -- | Type representing pretty exceptions.
 --
