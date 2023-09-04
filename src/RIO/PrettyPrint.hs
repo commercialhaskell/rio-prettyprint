@@ -12,27 +12,43 @@ module RIO.PrettyPrint
   , displayPlain
   , displayWithColor
     -- * Logging based on pretty-print typeclass
+    -- | The @pretty...@ functions come in three varieties:
+    --
+    -- * The normal variety, with a single styled document;
+    -- * The @L@ variety. The listed styled documents are concatenated with
+    --   'fillSep'; and
+    -- * The @S@ variety. 'flow' is applied to the 'String'.
+    --
+    -- Pretty message at log level 'LevelDebug'.
   , prettyDebug
-  , prettyInfo
-  , prettyNote
-  , prettyWarn
-  , prettyError
-  , prettyWarnNoIndent
-  , prettyErrorNoIndent
   , prettyDebugL
-  , prettyInfoL
-  , prettyNoteL
-  , prettyWarnL
-  , prettyErrorL
-  , prettyWarnNoIndentL
-  , prettyErrorNoIndentL
   , prettyDebugS
+    -- | Pretty message at log level 'LevelInfo'.
+  , prettyInfo
+  , prettyInfoL
   , prettyInfoS
+    -- | Pretty messages at log level 'LevelInfo', starting on a new line with
+    -- label @Note:@, with the message indented after the label.
+  , prettyNote
+  , prettyNoteL
   , prettyNoteS
+    -- | Pretty messages at log level 'LevelWarn', starting on a new line with
+    -- label @Warning:@, with or without the message indented after the label.
+  , prettyWarn
+  , prettyWarnL
   , prettyWarnS
-  , prettyErrorS
+  , prettyWarnNoIndent
+  , prettyWarnNoIndentL
   , prettyWarnNoIndentS
+    -- | Pretty messages at log level 'LevelError', starting on a new line with
+    -- label @Error:@, with or without the message indented after the label.
+  , prettyError
+  , prettyErrorL
+  , prettyErrorS
+  , prettyErrorNoIndent
+  , prettyErrorNoIndentL
   , prettyErrorNoIndentS
+
     -- * Semantic styling functions
     -- | These are used rather than applying colors or other styling directly,
     -- to provide consistency.
@@ -185,7 +201,7 @@ prettyErrorNoIndentS = prettyErrorNoIndentWith flow
 indentAfterLabel :: StyleDoc -> StyleDoc
 indentAfterLabel = align
 
--- | Make a 'Doc' from each word in a 'String'
+-- | Make a 'StyleDoc' from each word in a 'String'
 wordDocs :: String -> [StyleDoc]
 wordDocs = map fromString . words
 
@@ -193,6 +209,22 @@ wordDocs = map fromString . words
 flow :: String -> StyleDoc
 flow = fillSep . wordDocs
 
+-- | @debug message action@ brackets any output of the specified @action@ with
+-- an initial and final @message@ at log level 'LevelDebug'. The initial message
+-- is prefixed with the label @Start:@. The final message is prefixed with
+-- information about the duration of the action in milliseconds (ms) and, if
+-- an exception is thrown by the action, the exception. For example:
+--
+-- > Start: <message>
+-- > <output of action>
+-- > Finished in ...ms: <message>
+--
+-- or:
+--
+-- > Start: <message>
+-- > <output of action>
+-- > Finished with exception in ...ms: <message>
+-- > Exception thrown: <exception_message>
 debugBracket :: (HasCallStack, HasTerm env, MonadReader env m,
                  MonadIO m, MonadUnliftIO m) => StyleDoc -> m a -> m a
 debugBracket msg f = do
@@ -215,12 +247,15 @@ debugBracket msg f = do
   output $ "Finished in" <+> displayMilliseconds diff <> ":" <+> msg
   return x
 
--- |Annotate a 'StyleDoc' with a 'Style'.
+-- | Annotate a 'StyleDoc' with a 'Style'.
 style :: Style -> StyleDoc -> StyleDoc
 style = styleAnn
 
--- Display milliseconds.
-displayMilliseconds :: Double -> StyleDoc
+-- | Display as milliseconds in style 'Good'.
+displayMilliseconds ::
+     Double
+     -- ^ Amount of time in seconds.
+  -> StyleDoc
 displayMilliseconds t = style Good $
   fromString (show (round (t * 1000) :: Int)) <> "ms"
 
