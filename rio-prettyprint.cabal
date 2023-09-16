@@ -1,11 +1,11 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.4.
+-- This file has been generated from package.yaml by hpack version 0.35.5.
 --
 -- see: https://github.com/sol/hpack
 
 name:           rio-prettyprint
-version:        0.1.5.0
+version:        0.1.6.0
 synopsis:       Pretty-printing for RIO
 description:    Combine RIO's log capabilities with pretty printing
 category:       Development

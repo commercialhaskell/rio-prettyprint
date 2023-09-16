@@ -1,5 +1,10 @@
 # Changelog for rio-prettyprint
 
+## 0.1.6.0
+
+* Add `mkBulletedList` for greater flexibility in the format of such lists.
+* Improve Haddock documentation.
+
 ## 0.1.5.0
 
 * Add `Pretty` instances for `SomeBase Dir` and `SomeBase File`.
