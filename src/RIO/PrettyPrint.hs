@@ -57,8 +57,9 @@ module RIO.PrettyPrint
   , logLevelToStyle
     -- * Formatting utils
   , bulletedList
-  , mkNarrativeList
   , spacedBulletedList
+  , mkBulletedList
+  , mkNarrativeList
   , debugBracket
     -- * Re-exports from "Text.PrettyPrint.Leijen.Extended"
   , Pretty (..)
@@ -259,9 +260,25 @@ displayMilliseconds ::
 displayMilliseconds t = style Good $
   fromString (show (round (t * 1000) :: Int)) <> "ms"
 
--- | Display a bulleted list of 'StyleDoc'.
+-- | Display a bulleted list of 'StyleDoc' with @*@ as the bullet point.
 bulletedList :: [StyleDoc] -> StyleDoc
-bulletedList = mconcat . intersperse line . map (("*" <+>) . align)
+bulletedList = mkBulletedList False '*'
+
+-- | Display a bulleted list of 'StyleDoc', spaced with blank lines or not,
+-- given a character for the bullet point.
+--
+-- @since 0.1.6.0
+mkBulletedList ::
+     Bool
+     -- ^ Spaced with a blank line between each item?
+  -> Char
+     -- ^ The character to act as the bullet point.
+  -> [StyleDoc] 
+  -> StyleDoc
+mkBulletedList isSpaced bullet = 
+  mconcat . intersperse spacer . map ((fromString [bullet] <+>) . align)
+ where
+  spacer = if isSpaced then line <> line else line
 
 -- | A helper function to yield a narrative list from a list of items, with a
 -- final fullstop. For example, helps produce the output
@@ -290,9 +307,9 @@ mkNarrativeList mStyle useSerialComma (x:xs) =
   : mkNarrativeList mStyle useSerialComma xs
 
 -- | Display a bulleted list of 'StyleDoc' with a blank line between
--- each.
+-- each and @*@ as the bullet point.
 spacedBulletedList :: [StyleDoc] -> StyleDoc
-spacedBulletedList = mconcat . intersperse (line <> line) . map (("*" <+>) . align)
+spacedBulletedList = mkBulletedList True '*'
 
 -- | The 'Style' intended to be associated with a 'LogLevel'.
 --
