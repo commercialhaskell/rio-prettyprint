@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           rio-prettyprint
-version:        0.1.6.0
+version:        0.1.7.0
 synopsis:       Pretty-printing for RIO
 description:    Combine RIO's log capabilities with pretty printing
 category:       Development
@@ -13,10 +13,14 @@ homepage:       https://github.com/commercialhaskell/rio-prettyprint#readme
 bug-reports:    https://github.com/commercialhaskell/rio-prettyprint/issues
 author:         Michael Snoyman
 maintainer:     michael@snoyman.com
-copyright:      2018-2019 FP Complete
+copyright:      2018-2023 FP Complete
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
+extra-source-files:
+    ChangeLog.md
+    README.md
+    stack.yaml
 
 source-repository head
   type: git

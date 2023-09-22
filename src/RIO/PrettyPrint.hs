@@ -48,6 +48,9 @@ module RIO.PrettyPrint
   , prettyErrorNoIndent
   , prettyErrorNoIndentL
   , prettyErrorNoIndentS
+    -- | Pretty messages at the specified log level.
+  , prettyGeneric
+  , prettyWith
 
     -- * Semantic styling functions
     -- | These are used rather than applying colors or other styling directly,
@@ -129,6 +132,13 @@ displayWithColor x = do
   (if useAnsi then displayAnsi else displayPlain) termWidth x
 
 -- TODO: switch to using implicit callstacks once 7.8 support is dropped
+
+prettyGeneric ::
+     (HasTerm env, HasCallStack, Pretty b, MonadReader env m, MonadIO m)
+  => LogLevel
+  -> b
+  -> m ()
+prettyGeneric level = prettyWith level id
 
 prettyWith ::
      (HasTerm env, HasCallStack, Pretty b, MonadReader env m, MonadIO m)
@@ -273,9 +283,9 @@ mkBulletedList ::
      -- ^ Spaced with a blank line between each item?
   -> Char
      -- ^ The character to act as the bullet point.
-  -> [StyleDoc] 
+  -> [StyleDoc]
   -> StyleDoc
-mkBulletedList isSpaced bullet = 
+mkBulletedList isSpaced bullet =
   mconcat . intersperse spacer . map ((fromString [bullet] <+>) . align)
  where
   spacer = if isSpaced then line <> line else line
