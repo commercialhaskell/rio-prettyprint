@@ -8,6 +8,7 @@
   exception.
 * Add `prettyGeneric` and `prettyWith` for greater flexibility with pretty
   logging.
+* Add `blankLine`.
 
 ## 0.1.6.0
 

@@ -59,6 +59,7 @@ module RIO.PrettyPrint
   , displayMilliseconds
   , logLevelToStyle
     -- * Formatting utils
+  , blankLine
   , bulletedList
   , spacedBulletedList
   , mkBulletedList
@@ -219,6 +220,10 @@ wordDocs = map fromString . words
 -- | Wordwrap a 'String'
 flow :: String -> StyleDoc
 flow = fillSep . wordDocs
+
+-- | A blank line.
+blankLine :: StyleDoc
+blankLine = line <> line
 
 -- | @debug message action@ brackets any output of the specified @action@ with
 -- an initial and final @message@ at log level 'LevelDebug'. The initial message
