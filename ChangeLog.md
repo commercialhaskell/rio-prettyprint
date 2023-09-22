@@ -1,5 +1,14 @@
 # Changelog for rio-prettyprint
 
+## 0.1.7.0
+
+* Add `prettyThrowIO` and `prettyThrowM`, to throw an exception as a
+  `PrettyException`.
+* Add `ppException`, to provide the prettiest available information about an
+  exception.
+* Add `prettyGeneric` and `prettyWith` for greater flexibility with pretty
+  logging.
+
 ## 0.1.6.0
 
 * Add `mkBulletedList` for greater flexibility in the format of such lists.

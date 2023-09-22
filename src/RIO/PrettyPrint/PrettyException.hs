@@ -56,10 +56,16 @@
 --
 module RIO.PrettyPrint.PrettyException
   ( PrettyException (..)
+  , ppException
+  , prettyThrowIO
+  , prettyThrowM
   ) where
 
-import RIO ( Exception (..), Show, Typeable )
-import Text.PrettyPrint.Leijen.Extended ( Pretty (..) )
+import RIO
+         ( Exception (..), Maybe (..), MonadIO, MonadThrow, Show, SomeException
+         , Typeable, (.), throwIO, throwM
+         )
+import Text.PrettyPrint.Leijen.Extended ( Pretty (..), StyleDoc, string )
 
 -- | Type representing pretty exceptions.
 --
@@ -75,3 +81,18 @@ instance Pretty PrettyException where
 
 instance Exception PrettyException where
   displayException (PrettyException e) = displayException e
+
+-- | Provide the prettiest available information about an exception.
+ppException :: SomeException -> StyleDoc
+ppException e = case fromException e of
+  Just (PrettyException e') -> pretty e'
+  Nothing -> (string . displayException) e
+
+-- | Synchronously throw the given exception as a 'PrettyException'.
+prettyThrowIO :: (Exception e, MonadIO m, Pretty e) => e -> m a
+prettyThrowIO = throwIO . PrettyException
+
+-- | Throw the given exception as a 'PrettyException', when the action is run in
+-- the monad @m@.
+prettyThrowM :: (Exception e, MonadThrow m, Pretty e) => e -> m a
+prettyThrowM = throwM . PrettyException

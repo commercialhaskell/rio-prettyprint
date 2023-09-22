@@ -1,13 +1,17 @@
 name:        rio-prettyprint
-version:     0.1.6.0
+version:     0.1.7.0
 synopsis:    Pretty-printing for RIO
+description: Combine RIO's log capabilities with pretty printing
 category:    Development
 author:      Michael Snoyman
 maintainer:  michael@snoyman.com
-copyright:   2018-2019 FP Complete
+copyright:   2018-2023 FP Complete
 license:     BSD3
 github:      commercialhaskell/rio-prettyprint
-description: Combine RIO's log capabilities with pretty printing
+extra-source-files:
+- ChangeLog.md
+- README.md
+- stack.yaml
 
 dependencies:
 - base >=4.10 && < 5
