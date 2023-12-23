@@ -18,13 +18,13 @@ jobs:
         - macos-latest
         - windows-latest
         resolver:
-        - stack-ghc-9.6.2.yaml
-        - stack-ghc-9.4.7.yaml
+        - stack-ghc-9.6.3.yaml
+        - stack-ghc-9.4.8.yaml
         - stack-ghc-9.2.8.yaml
         - stack-ghc-9.0.2.yaml
     steps:
     - name: Clone project
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Build and run tests
       shell: bash
       run: |
