@@ -1,5 +1,9 @@
 # Changelog for rio-prettyprint
 
+## 0.1.8.0
+
+* Add `Arch` and `OS` instances of `Pretty`.
+
 ## 0.1.7.0
 
 * Add `prettyThrowIO` and `prettyThrowM`, to throw an exception as a
@@ -17,12 +21,12 @@
 
 ## 0.1.5.0
 
-* Add `Pretty` instances for `SomeBase Dir` and `SomeBase File`.
+* Add `SomeBase Dir` and `SomeBase File` instances of `Pretty`.
 
 ## 0.1.4.0
 
 * Add `string` and `mkNarrativeList`.
-* The `Show` instance of `PrettyException` is now derived. `displayException` is
+* The `PrettyException` instance of `Show` is now derived. `displayException` is
   now defined, as the `displayException` of the inner exception.
 
 ## 0.1.3.0

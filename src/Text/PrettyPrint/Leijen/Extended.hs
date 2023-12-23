@@ -20,7 +20,7 @@ module Text.PrettyPrint.Leijen.Extended
 
     -- * Documents annotated by a style
   , StyleDoc (..)
-  , StyleAnn(..)
+  , StyleAnn (..)
   , displayAnsi
   , displayPlain
   , renderDefault
@@ -156,7 +156,9 @@ import           Control.Monad.Reader ( local, runReader )
 import           Data.Array.IArray ( (!), (//) )
 import qualified Data.Text as T
 import           Distribution.ModuleName ( ModuleName )
+import           Distribution.System ( Arch (..), OS (..) )
 import qualified Distribution.Text ( display )
+import           Distribution.Utils.Generic ( lowercase )
 import           Path ( Dir, File, Path, SomeBase, prjSomeBase, toFilePath )
 import           RIO
 import qualified RIO.Map as M
@@ -208,6 +210,14 @@ instance Pretty (SomeBase Dir) where
 
 instance Pretty ModuleName where
   pretty = StyleDoc . fromString . Distribution.Text.display
+
+instance Pretty Arch where
+  pretty (OtherArch name) = fromString name
+  pretty other = fromString $ lowercase $ show other
+
+instance Pretty OS where
+  pretty (OtherOS name) = fromString name
+  pretty other = fromString $ lowercase $ show other
 
 --------------------------------------------------------------------------------
 -- Style Doc
