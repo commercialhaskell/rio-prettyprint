@@ -1,5 +1,10 @@
 # Changelog for rio-prettyprint
 
+## 0.1.9.0
+
+* Add `prettyImpureThrow`, to generate a value which, when forced, will throw an
+  exception as a `PrettyException`.
+
 ## 0.1.8.0
 
 * Add `Arch` and `OS` instances of `Pretty`.

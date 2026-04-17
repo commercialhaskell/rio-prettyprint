@@ -59,11 +59,12 @@ module RIO.PrettyPrint.PrettyException
   , ppException
   , prettyThrowIO
   , prettyThrowM
+  , prettyImpureThrow
   ) where
 
 import RIO
          ( Exception (..), Maybe (..), MonadIO, MonadThrow, Show, SomeException
-         , Typeable, (.), throwIO, throwM
+         , Typeable, (.), impureThrow, throwIO, throwM
          )
 import Text.PrettyPrint.Leijen.Extended ( Pretty (..), StyleDoc, string )
 
@@ -96,3 +97,8 @@ prettyThrowIO = throwIO . PrettyException
 -- the monad @m@.
 prettyThrowM :: (Exception e, MonadThrow m, Pretty e) => e -> m a
 prettyThrowM = throwM . PrettyException
+
+-- | Generate a pure value which, when forced, will synchronously throw the
+-- given exception as a 'PrettyException'.
+prettyImpureThrow :: (Exception e, Pretty e) => e -> a
+prettyImpureThrow = impureThrow . PrettyException
